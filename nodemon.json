@@ -1,0 +1,6 @@
+{
+  "watch": ["src"],
+  "ext": "ts, html",
+  "ignore": ["src/public"],
+  "exec": "./node_modules/.bin/ts-node -r tsconfig-paths/register -r dotenv/config ./src"
+}
