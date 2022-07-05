@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 
-// CallbackCall schema
+// User schema
 export interface IUserModel {
   username: string;
   email: string;

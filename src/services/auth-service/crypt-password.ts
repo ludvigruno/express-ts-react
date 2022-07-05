@@ -1,14 +1,14 @@
-import { IAuthUser } from '../../routes/interfaces';
-import { UserType } from '../../routes/types';
-const bcrypt = require('bcrypt');
+import { IUser } from '../../interfaces/user-interface';
+import { UserType } from '../../types/types';
+import bcrypt from 'bcrypt';
 
 /**
  * Password hashing.
- * @param {IAuthUser} data
+ * @param {IUser} data
  *
  * @returns {Promise<UserType>}
  */
-export const cryptPassword = async (data: IAuthUser): Promise<UserType> => {
+export const cryptPassword = async (data: IUser): Promise<UserType> => {
   const { password } = data;
   const saltRounds = 10;
   const salt: string = await bcrypt.genSalt(saltRounds);

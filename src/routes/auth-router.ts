@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Router, Request, Response } from 'express';
 import StatusCodes from 'http-status-codes';
-
 import { body, check, validationResult } from 'express-validator';
 
 import authRepo from '../repos/auth-repo/auth-user';
 import userRepo from '../repos/user-repo/user';
 import authService from '../services/auth-service/check-user';
 import { cryptPassword } from '../services/auth-service/crypt-password';
-import { IBodyRequest, IAuthUser } from './interfaces';
+import { IUser } from '../interfaces/user-interface';
 
 import { MESSAGES } from '../constants';
 
@@ -28,39 +27,41 @@ export const p = {
 } as const;
 
 /**
- *  User registration
+ *  UserType registration
  */
 router.post(
   p.signUp,
-  check('data.username').not().isEmpty().isString(),
-  check('data.email').isEmail(),
-  check('data.password')
+  check('user.username').not().isEmpty().isString(),
+  check('user.email').isEmail(),
+  check('user.password')
     .isLength({ min: PASSWORD_CHARACTERS })
     .withMessage(PASSWORD_IS_NOT_VALID)
     .not()
     .isIn(PASSWORD_IS_NOT_VALID_WORD.PARAMS)
     .withMessage(PASSWORD_IS_NOT_VALID_WORD.MESSAGE),
-  check('data.repeatPassword')
+  check('user.repeatPassword')
     .isLength({ min: PASSWORD_CHARACTERS })
     .withMessage(PASSWORD_IS_NOT_VALID)
     .not()
     .isIn(PASSWORD_IS_NOT_VALID_WORD.PARAMS)
     .withMessage(PASSWORD_IS_NOT_VALID_WORD.MESSAGE),
-  check('data.avatar').isString(),
-  check('data.age').not().isEmpty().isNumeric(),
+  check('user.avatar').isString(),
+  check('user.age').not().isEmpty().isNumeric(),
   async (req: Request, res: Response): Promise<void> => {
-    const body: IBodyRequest = req.body;
+    const user: IUser = req.body.user;
+
     try {
-      await authService.checkUserSignUp(body.data);
+      await authService.checkUserSignUp(user);
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         throw errors.array();
       }
-      const data: IAuthUser = await cryptPassword(body.data);
+
+      const data: IUser = await cryptPassword(user);
 
       await authRepo.createAuth(data);
 
-      const result: string = await userRepo.registerUser(body.data);
+      const result: string = await userRepo.registerUser(user);
       res
         .status(CREATED)
         .json({
@@ -81,22 +82,22 @@ router.post(
 );
 
 /**
- * User login
+ * UserType login
  */
 router.post(
   p.signIn,
-  body('data.email').isEmail(),
-  body('data.password')
+  body('user.email').isEmail(),
+  body('user.password')
     .isLength({ min: PASSWORD_CHARACTERS })
     .withMessage(PASSWORD_IS_NOT_VALID),
   async (req: Request, res: Response): Promise<void> => {
-    const body: IBodyRequest = req.body;
+    const user: IUser = req.body.user;
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         throw errors.array();
       }
-      const result = await authService.checkUserSignIn(body.data);
+      const result = await authService.checkUserSignIn(user);
       res
         .status(OK)
         .json({

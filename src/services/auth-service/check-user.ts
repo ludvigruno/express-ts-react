@@ -1,18 +1,16 @@
-import { IAuthUser } from '../../routes/interfaces';
+import { IUser } from '../../interfaces/user-interface';
 import authRepo from '../../repos/auth-repo/auth-user';
 import { MESSAGES } from 'src/constants';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const bcrypt = require('bcrypt');
+import bcrypt from 'bcrypt';
 
 /**
- * User verification during registration.
- * @param {IAuthUser} data
+ * UserType verification during registration.
+ * @param {IUser} data
  *
- * @returns {Promise<string>}
+ * @returns {Promise<IUser>}
  */
-async function checkUserSignUp(data: IAuthUser): Promise<string> {
-  const isExistUser: IAuthUser | null = await authRepo.getAuth(data);
+async function checkUserSignUp(data: IUser): Promise<void> {
+  const isExistUser: IUser | null = await authRepo.getAuth(data);
   if (isExistUser) {
     throw `User ${isExistUser.email} already exists.`;
   } else {
@@ -20,18 +18,17 @@ async function checkUserSignUp(data: IAuthUser): Promise<string> {
     if (password !== repeatPassword) {
       throw MESSAGES.PASSWORDS_DO_NOT_MATCH;
     }
-    return 'Успех';
   }
 }
 
 /**
- * User login verification.
- * @param {IAuthUser} data
+ * UserType login verification.
+ * @param {IUser} data
  *
  * @returns {Promise<string>}
  */
-async function checkUserSignIn(data: IAuthUser): Promise<string> {
-  const isExistUser: IAuthUser | null = await authRepo.getAuth(data);
+async function checkUserSignIn(data: IUser): Promise<string> {
+  const isExistUser: IUser | null = await authRepo.getAuth(data);
   if (isExistUser) {
     if (!bcrypt.compareSync(data.password, isExistUser.password)) {
       throw MESSAGES.WRONG_PASSWORD;

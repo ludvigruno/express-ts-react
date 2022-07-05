@@ -1,13 +1,14 @@
-import { IAuthUser } from '../../routes/interfaces';
+import { IUser } from '../../interfaces/user-interface';
 import { AuthModel } from '../../models/auth-model';
 
 /**
- * Создание аутентификации.
+ * Creation of authentication.
  *
- * @param {IAuthUser} data
+ * @param {IUser} data
+ *
  * @returns {Promise<void>}
  */
-async function createAuth(data: IAuthUser): Promise<void> {
+async function createAuth(data: IUser): Promise<void> {
   const username = data.username;
   const email = data.email;
   const password = data.password;
@@ -23,13 +24,14 @@ async function createAuth(data: IAuthUser): Promise<void> {
 }
 
 /**
- * Получение аутентификации пользователя.
+ * Get user authentication.
  *
- * @param {IAuthUser} data
- * @returns {Promise<IAuthUser | null>}
+ * @param {IUser} data
+ *
+ * @returns {Promise<IUser | null>}
  */
 
-async function getAuth(data: IAuthUser): Promise<IAuthUser | null> {
+async function getAuth(data: IUser): Promise<IUser | null> {
   return await AuthModel.findOne({ email: data.email });
 }
 

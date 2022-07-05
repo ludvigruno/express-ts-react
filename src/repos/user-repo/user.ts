@@ -1,5 +1,5 @@
-import { IAuthUser } from '@routes/interfaces';
-import { UserType } from '@routes/types';
+import { IUser } from 'src/interfaces/user-interface';
+import { UserType } from 'src/types/types';
 import { UserModel } from '../../models/users-model';
 import { MESSAGES } from '../../constants';
 
@@ -7,12 +7,13 @@ import { MESSAGES } from '../../constants';
 const { USER_CREATED } = MESSAGES;
 
 /**
- * Регистрация пользователя.
+ * User registration.
  *
- * @param {IAuthUser} data
+ * @param {IUser} data
+ *
  * @returns {Promise<string>}
  */
-async function registerUser(data: IAuthUser): Promise<string> {
+async function registerUser(data: IUser): Promise<string> {
   const username = data.username;
   const email = data.email;
   const avatar = data.avatar;
@@ -32,25 +33,36 @@ async function registerUser(data: IAuthUser): Promise<string> {
 }
 
 /**
- * Получение пользователя по id
+ * Getting list of users without client id.
  *
  * @param {string} id
+ *
+ * @returns {Promise<UserType[]>}
+ */
+async function getUsersWithoutCurrentId(id: string): Promise<UserType[]> {
+  return (await UserModel.find({ _id: { $ne: id } })) as unknown as Promise<
+    UserType[]
+  >;
+}
+
+/**
+ * Getting a list of all users.
+ *
+ * @returns {Promise<UserType[]>}
+ */
+async function getUsers(): Promise<UserType[]> {
+  return (await UserModel.find()) as unknown as Promise<UserType[]>;
+}
+
+/**
+ * Getting a user by id.
+ *
+ * @param {string} id
+ *
  * @returns {Promise<UserType | null>}
  */
 async function getUserById(id: string): Promise<UserType | null> {
   return await UserModel.findById(id);
-}
-
-/**
- * Получение списка пользователей без клиента id
- *
- * @param {string} id
- * @returns {Promise<(UserType | null)[]>}
- */
-async function getUsersWithoutCurrentId(
-  id: string,
-): Promise<(UserType | null)[]> {
-  return await UserModel.find({ _id: { $ne: id } });
 }
 
 // Export default
@@ -58,4 +70,5 @@ export default {
   registerUser,
   getUserById,
   getUsersWithoutCurrentId,
+  getUsers,
 } as const;

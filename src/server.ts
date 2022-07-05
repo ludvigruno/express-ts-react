@@ -10,8 +10,12 @@ import apiRouter from './routes/api';
 import logger from 'jet-logger';
 import { CustomError } from '@shared/errors';
 
-import * as Sentry from '@sentry/node';
-import * as Tracing from '@sentry/tracing';
+import cors from 'cors';
+
+import 'reflect-metadata';
+import { graphqlHTTP } from 'express-graphql';
+import { buildSchema } from 'type-graphql';
+import { UsersResolver } from './graphql/resolvers/users';
 
 import dotenv from 'dotenv';
 
@@ -30,6 +34,32 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+app.use(
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  cors({
+    origin: ['http://localhost:3001', 'http://localhost:3002'],
+    credentials: true,
+  }),
+);
+
+// Creating a Schema for GraphQL
+const schema = async () => {
+  const schema: any = await buildSchema({
+    resolvers: [UsersResolver],
+    emitSchemaFile: true,
+    validate: false,
+  });
+  app.use(
+    '/graphql',
+    graphqlHTTP({
+      schema,
+      graphiql: true,
+    }),
+  );
+};
+
+schema();
+
 // Show routes called in console during development
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
@@ -40,34 +70,12 @@ if (process.env.NODE_ENV === 'production') {
   app.use(helmet());
 }
 
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-  integrations: [
-    // enable HTTP calls tracing
-    new Sentry.Integrations.Http({ tracing: true }),
-    // enable Express.js middleware tracing
-    new Tracing.Integrations.Express({ app }),
-  ],
-
-  // Set tracesSampleRate to 1.0 to capture 100%
-  // of transactions for performance monitoring.
-  // We recommend adjusting this value in production
-  tracesSampleRate: 1.0,
-});
-app.use(Sentry.Handlers.requestHandler());
-app.use(Sentry.Handlers.tracingHandler());
-app.get('/debug-sentry', function mainHandler() {
-  throw new Error('My first Sentry error!');
-});
 /***********************************************************************************
  *                         API routes and error handling
  **********************************************************************************/
 
 // Add api router
 app.use('/', apiRouter);
-
-// Error handling
-app.use(Sentry.Handlers.errorHandler());
 
 app.use(
   (err: Error | CustomError, _: Request, res: Response, __: NextFunction) => {
