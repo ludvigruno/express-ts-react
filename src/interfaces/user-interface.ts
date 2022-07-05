@@ -1,8 +1,4 @@
-export interface IBodyRequest {
-  data: IAuthUser;
-}
-
-export interface IAuthUser {
+export interface IUser {
   username: string;
   email: string;
   password: string;

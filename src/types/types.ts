@@ -1,3 +1,7 @@
+export type UserNestedType = {
+  user: UserType;
+};
+
 export type UserType = {
   username: string;
   email: string;

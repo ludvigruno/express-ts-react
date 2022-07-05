@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 
-// Auth users schema
+// Auth user schema
 export interface IAuthModel {
   username: string;
   email: string;
