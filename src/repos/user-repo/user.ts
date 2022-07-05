@@ -14,11 +14,15 @@ const { USER_CREATED } = MESSAGES;
  * @returns {Promise<string>}
  */
 async function registerUser(data: IUser): Promise<string> {
+  const name = data.name;
+  const surname = data.surname;
   const username = data.username;
   const email = data.email;
   const avatar = data.avatar;
   const age = data.age;
   const obj = {
+    name,
+    surname,
     username,
     email,
     avatar,
