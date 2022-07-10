@@ -1,5 +1,4 @@
-import { IUser } from 'src/interfaces/user-interface';
-import { UserType } from 'src/types/types';
+import { CreateUser, User } from 'src/interfaces/user-interface';
 import { UserModel } from '../../models/users-model';
 import { MESSAGES } from '../../constants';
 
@@ -7,72 +6,86 @@ import { MESSAGES } from '../../constants';
 const { USER_CREATED } = MESSAGES;
 
 /**
- * User registration.
+ * User create.
  *
- * @param {IUser} data
+ * @param {CreateUser} data
  *
- * @returns {Promise<string>}
+ * @returns {Promise<void>}
  */
-async function registerUser(data: IUser): Promise<string> {
-  const name = data.name;
-  const surname = data.surname;
-  const username = data.username;
-  const email = data.email;
-  const avatar = data.avatar;
-  const age = data.age;
+async function creatUser(data: CreateUser): Promise<void> {
+  const { email, userAuthId } = data;
+  const username = email.split('@')[0];
   const obj = {
-    name,
-    surname,
     username,
     email,
-    avatar,
-    age,
+    userAuthId,
     created_at: new Date(),
   };
 
   const user = new UserModel(obj);
-
   await user.save();
-  return USER_CREATED;
-}
-
-/**
- * Getting list of users without client id.
- *
- * @param {string} id
- *
- * @returns {Promise<UserType[]>}
- */
-async function getUsersWithoutCurrentId(id: string): Promise<UserType[]> {
-  return (await UserModel.find({ _id: { $ne: id } })) as unknown as Promise<
-    UserType[]
-  >;
 }
 
 /**
  * Getting a list of all users.
  *
- * @returns {Promise<UserType[]>}
+ * @returns {Promise<User[]>}
  */
-async function getUsers(): Promise<UserType[]> {
-  return (await UserModel.find()) as unknown as Promise<UserType[]>;
+async function getUsers(): Promise<User[]> {
+  return await UserModel.find();
 }
 
-/**
- * Getting a user by id.
- *
- * @param {string} id
- *
- * @returns {Promise<UserType | null>}
- */
-async function getUserById(id: string): Promise<UserType | null> {
-  return await UserModel.findById(id);
-}
+// /**
+//  * Getting list of users without client id.
+//  *
+//  * @param {string} id
+//  *
+//  * @returns {Promise<UserType[]>}
+//  */
+// async function getUsersWithoutCurrentId(id: string): Promise<UserType[]> {
+//   return (await UserModel.find({ _id: { $ne: id } })) as unknown as Promise<
+//     UserType[]
+//   >;
+// }
+
+// /**
+//  * Getting a list of all users.
+//  *
+//  * @returns {Promise<UserType[]>}
+//  */
+// async function getUsers(): Promise<UserType[]> {
+//   return (await UserModel.find()) as unknown as Promise<UserType[]>;
+// }
+
+// /**
+//  * Getting a user by id.
+//  *
+//  * @param {string} id
+//  *
+//  * @returns {Promise<UserType | null>}
+//  */
+// async function getUserById(id: string): Promise<UserType | null> {
+//   return await UserModel.findById(id);
+// }
+
+// /**
+//  * Getting a user by client Account Id.
+//  *
+//  * @param {string} email
+//  *
+//  * @returns {Promise<UserType | null>}
+//  */
+// async function getUserByClientAccountId(
+//   clientAccountId: string,
+// ): Promise<UserType | null> {
+//   return await UserModel.findOne({ clientAccountId });
+// }
 
 // Export default
 export default {
-  registerUser,
-  getUserById,
-  getUsersWithoutCurrentId,
+  creatUser,
   getUsers,
+  // getUsersWithoutCurrentId,
+  // getUsers,
+  // getUserByClientAccountId,
 } as const;
