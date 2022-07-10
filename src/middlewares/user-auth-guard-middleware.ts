@@ -3,8 +3,11 @@ import { Request, Response, NextFunction } from 'express';
 
 import tokenService from '@services/user-auth-service/token-service';
 
+interface UserResponseData extends Request {
+  user?: { [x: string]: string };
+}
 export const userAuthGuard = (
-  req: Request,
+  req: UserResponseData,
   res: Response,
   next: NextFunction,
 ) => {
@@ -22,7 +25,7 @@ export const userAuthGuard = (
     if (!userUserAuthData) {
       return next(ApiError.UnautorizeError());
     }
-    req.user = userUserAuthData;
+    req = Object.assign(req, { user: userUserAuthData });
     next();
   } catch (error) {
     return next(ApiError.UnautorizeError());
