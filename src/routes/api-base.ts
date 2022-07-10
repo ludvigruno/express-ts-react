@@ -2,12 +2,12 @@ import { Router } from 'express';
 import authRouter from './auth-router';
 import userRouter from './user-router';
 
-// Export the base-router
+// constant the base-router.
 const baseRouter = Router();
 
-// Setup routers
-baseRouter.use('/', authRouter);
-baseRouter.use('/route', userRouter);
+// Setup router
+baseRouter.use('/api', authRouter);
+baseRouter.use('/user', userRouter);
 
-// Export default.
+// Export the base-router.
 export default baseRouter;
